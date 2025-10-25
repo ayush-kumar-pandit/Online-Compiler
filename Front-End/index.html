@@ -1,229 +1,313 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cloud Code Compiler</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom styles for a better code editor feel */
-        body {
-            font-family: 'Inter', sans-serif;
+      /* Custom styles for a better code editor feel */
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      @import url("https://rsms.me/inter/inter.css");
+      #editor,
+      #stdin {
+        font-family: "Fira Code", "Courier New", monospace;
+        tab-size: 4;
+        -moz-tab-size: 4;
+        -o-tab-size: 4;
+        white-space: pre;
+      }
+      /* Simple spinner animation */
+      .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top: 4px solid #3498db;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
         }
-        @import url('https://rsms.me/inter/inter.css');
-        #editor, #stdin {
-            font-family: 'Fira Code', 'Courier New', monospace;
-            tab-size: 4;
-            -moz-tab-size: 4;
-            -o-tab-size: 4;
-            white-space: pre;
+        100% {
+          transform: rotate(360deg);
         }
-        /* Simple spinner animation */
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 4px solid #3498db;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+      }
     </style>
-</head>
-<body class="bg-gray-900 text-gray-200">
-
+  </head>
+  <body class="bg-gray-900 text-gray-200">
     <div class="container mx-auto p-4 max-w-7xl">
-        <header class="mb-6">
-            <h1 class="text-4xl font-bold text-white">Cloud Code Compiler</h1>
-            <p class="text-gray-400">A clean interface to compile and run code using a Flask & Judge0 backend.</p>
-        </header>
+      <header class="mb-6">
+        <h1 class="text-4xl font-bold text-white">Cloud Code Compiler</h1>
+        <p class="text-gray-400">
+          A clean interface to compile and run code using a Flask & Judge0
+          backend.
+        </p>
+      </header>
 
-        <main class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Left Column: Editor and Inputs -->
-            <div class="flex flex-col gap-4">
-                <div class="bg-gray-800 p-4 rounded-lg shadow-lg">
-                    <label for="language" class="block text-sm font-medium text-gray-300 mb-2">Language</label>
-                    <!-- 
+      <main class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Left Column: Editor and Inputs -->
+        <div class="flex flex-col gap-4">
+          <div class="bg-gray-800 p-4 rounded-lg shadow-lg">
+            <label
+              for="language"
+              class="block text-sm font-medium text-gray-300 mb-2"
+              >Language</label
+            >
+            <!-- 
                       FIX: The <option> values now EXACTLY match the keys
                       in the backend LANGUAGE_MAP.
                     -->
-                    <select id="language" class="w-full bg-gray-700 border border-gray-600 text-white rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                        <option value="Python 3">Python 3</option>
-                        <option value="Node.js (JavaScript)">Node.js (JavaScript)</option>
-                        <option value="C++">C++</option>
-                        <option value="C">C</option>
-                        <option value="Java">Java</option>
-                        <option value="C#">C#</option>
-                        <option value="Go">Go</option>
-                        <option value="Rust">Rust</option>
-                        <option value="TypeScript">TypeScript</option>
-                        <option value="Plain Text">Plain Text</option>
-                    </select>
-                </div>
-                
-                <div>
-                    <label for="editor" class="block text-sm font-medium text-gray-300 mb-2">Source Code</label>
-                    <textarea id="editor" class="w-full h-96 bg-gray-800 border border-gray-600 rounded-md p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" spellcheck="false"></textarea>
-                </div>
+            <select
+              id="language"
+              class="w-full bg-gray-700 border border-gray-600 text-white rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            >
+              <option value="Python 3">Python 3</option>
+              <option value="Node.js (JavaScript)">Node.js (JavaScript)</option>
+              <option value="C++">C++</option>
+              <option value="C">C</option>
+              <option value="Java">Java</option>
+              <option value="C#">C#</option>
+              <option value="Go">Go</option>
+              <option value="Rust">Rust</option>
+              <option value="TypeScript">TypeScript</option>
+              <option value="Plain Text">Plain Text</option>
+            </select>
+          </div>
 
-                <div>
-                    <label for="stdin" class="block text-sm font-medium text-gray-300 mb-2">Standard Input (stdin)</label>
-                    <textarea id="stdin" class="w-full h-32 bg-gray-800 border border-gray-600 rounded-md p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
-                </div>
-            </div>
+          <div>
+            <label
+              for="editor"
+              class="block text-sm font-medium text-gray-300 mb-2"
+              >Source Code</label
+            >
+            <textarea
+              id="editor"
+              class="w-full h-96 bg-gray-800 border border-gray-600 rounded-md p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              spellcheck="false"
+            ></textarea>
+          </div>
 
-            <!-- Right Column: Output -->
-            <div class="flex flex-col">
-                <button id="run-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 mb-4">
-                    Run Code
-                </button>
-                <div id="output-container" class="bg-gray-800 rounded-lg shadow-lg p-4 h-full flex flex-col">
-                    <h2 class="text-xl font-semibold mb-2 border-b border-gray-700 pb-2">Output</h2>
-                    <div id="output" class="flex-grow overflow-auto text-sm whitespace-pre-wrap font-mono">
-                        <p class="text-gray-500">Your code's output will appear here...</p>
-                    </div>
-                </div>
+          <div>
+            <label
+              for="stdin"
+              class="block text-sm font-medium text-gray-300 mb-2"
+              >Standard Input (stdin)</label
+            >
+            <textarea
+              id="stdin"
+              class="w-full h-32 bg-gray-800 border border-gray-600 rounded-md p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Right Column: Output -->
+        <div class="flex flex-col">
+          <button
+            id="run-btn"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 mb-4"
+          >
+            Run Code
+          </button>
+          <div
+            id="output-container"
+            class="bg-gray-800 rounded-lg shadow-lg p-4 h-full flex flex-col"
+          >
+            <h2
+              class="text-xl font-semibold mb-2 border-b border-gray-700 pb-2"
+            >
+              Output
+            </h2>
+            <div
+              id="output"
+              class="flex-grow overflow-auto text-sm whitespace-pre-wrap font-mono"
+            >
+              <p class="text-gray-500">
+                Your code's output will appear here...
+              </p>
             </div>
-        </main>
+          </div>
+        </div>
+      </main>
     </div>
 
     <script>
-        const editor = document.getElementById('editor');
-        const languageSelect = document.getElementById('language');
-        const stdinInput = document.getElementById('stdin');
-        const runBtn = document.getElementById('run-btn');
-        const outputDiv = document.getElementById('output');
+      const editor = document.getElementById("editor");
+      const languageSelect = document.getElementById("language");
+      const stdinInput = document.getElementById("stdin");
+      const runBtn = document.getElementById("run-btn");
+      const outputDiv = document.getElementById("output");
 
-        const BACKEND_URL = 'http://127.0.0.1:5000';
+      editor.addEventListener("keydown", function (e) {
+        if (e.key === "Tab") {
+          e.preventDefault();
 
-        // FIX: The keys of this object now EXACTLY match the <option> values
-        const defaultCode = {
-            "Python 3": 'a = int(input())\nb = int(input())\nprint(f"Sum: {a + b}")',
-            "Node.js (JavaScript)": 'const readline = require("readline");\nconst rl = readline.createInterface({ input: process.stdin, output: process.stdout });\nlet lines = [];\nrl.on("line", (line) => lines.push(line));\nrl.on("close", () => {\n    const a = parseInt(lines[0] || "0");\n    const b = parseInt(lines[1] || "0");\n    console.log(`Sum: ${a + b}`);\n});',
-            "Java": 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int a = sc.nextInt();\n        int b = sc.nextInt();\n        System.out.println("Sum: " + (a + b));\n    }\n}',
-            "C++": '#include <iostream>\n\nint main() {\n    int a, b;\n    std::cin >> a >> b;\n    std::cout << "Sum: " << a + b << std::endl;\n    return 0;\n}',
-            "C": '#include <stdio.h>\n\nint main() {\n    int a, b;\n    scanf("%d", &a);\n    scanf("%d", &b);\n    printf("Sum: %d\\n", a + b);\n    return 0;\n}',
-            "C#": 'using System;\n\npublic class Program {\n    public static void Main() {\n        int a = int.Parse(Console.ReadLine());\n        int b = int.Parse(Console.ReadLine());\n        Console.WriteLine($"Sum: {a + b}");\n    }\n}',
-            "Go": 'package main\nimport "fmt"\n\nfunc main() {\n    var a, b int\n    fmt.Scanln(&a)\n    fmt.Scanln(&b)\n    fmt.Println("Sum:", a + b)\n}',
-            "Rust": 'use std::io;\n\nfn main() {\n    let mut line1 = String::new();\n    io::stdin().read_line(&mut line1).unwrap();\n    let a: i32 = line1.trim().parse().unwrap_or(0);\n\n    let mut line2 = String::new();\n    io::stdin().read_line(&mut line2).unwrap();\n    let b: i32 = line2.trim().parse().unwrap_or(0);\n\n    println!("Sum: {}", a + b);\n}',
-            "TypeScript": '// Note: Needs node-ts to run this stdin example\n// This will likely fail unless Judge0 is configured for it.\n// A simpler console.log will work.\nconsole.log("Hello, TypeScript!");',
-            "Plain Text": 'This is just plain text.\nIt will be "executed" by Judge0,\nbut will likely just return the text as output.'
-        };
-        
-        // Load initial code
+          const start = this.selectionStart;
+          const end = this.selectionEnd;
+
+          this.value =
+            this.value.substring(0, start) + "\t" + this.value.substring(end);
+
+          this.selectionStart = this.selectionEnd = start + 1;
+        }
+      });
+      const BACKEND_URL = "http://127.0.0.1:5000";
+
+      // FIX: The keys of this object now EXACTLY match the <option> values
+      const defaultCode = {
+        "Python 3":
+          'a = int(input())\nb = int(input())\nprint(f"Sum: {a + b}")',
+        "Node.js (JavaScript)":
+          'const readline = require("readline");\nconst rl = readline.createInterface({ input: process.stdin, output: process.stdout });\nlet lines = [];\nrl.on("line", (line) => lines.push(line));\nrl.on("close", () => {\n    const a = parseInt(lines[0] || "0");\n    const b = parseInt(lines[1] || "0");\n    console.log(`Sum: ${a + b}`);\n});',
+        Java: 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int a = sc.nextInt();\n        int b = sc.nextInt();\n        System.out.println("Sum: " + (a + b));\n    }\n}',
+        "C++":
+          '#include <iostream>\n\nint main() {\n    int a, b;\n    std::cin >> a >> b;\n    std::cout << "Sum: " << a + b << std::endl;\n    return 0;\n}',
+        C: '#include <stdio.h>\n\nint main() {\n    int a, b;\n    scanf("%d", &a);\n    scanf("%d", &b);\n    printf("Sum: %d\\n", a + b);\n    return 0;\n}',
+        "C#": 'using System;\n\npublic class Program {\n    public static void Main() {\n        int a = int.Parse(Console.ReadLine());\n        int b = int.Parse(Console.ReadLine());\n        Console.WriteLine($"Sum: {a + b}");\n    }\n}',
+        Go: 'package main\nimport "fmt"\n\nfunc main() {\n    var a, b int\n    fmt.Scanln(&a)\n    fmt.Scanln(&b)\n    fmt.Println("Sum:", a + b)\n}',
+        Rust: 'use std::io;\n\nfn main() {\n    let mut line1 = String::new();\n    io::stdin().read_line(&mut line1).unwrap();\n    let a: i32 = line1.trim().parse().unwrap_or(0);\n\n    let mut line2 = String::new();\n    io::stdin().read_line(&mut line2).unwrap();\n    let b: i32 = line2.trim().parse().unwrap_or(0);\n\n    println!("Sum: {}", a + b);\n}',
+        TypeScript:
+          '// Note: Needs node-ts to run this stdin example\n// This will likely fail unless Judge0 is configured for it.\n// A simpler console.log will work.\nconsole.log("Hello, TypeScript!");',
+        "Plain Text":
+          'This is just plain text.\nIt will be "executed" by Judge0,\nbut will likely just return the text as output.',
+      };
+
+      // Load initial code
+      editor.value = defaultCode[languageSelect.value];
+      stdinInput.value = "5\n10";
+
+      // Update editor with default code on language change
+      languageSelect.addEventListener("change", () => {
         editor.value = defaultCode[languageSelect.value];
-        stdinInput.value = "5\n10";
+      });
 
-        // Update editor with default code on language change
-        languageSelect.addEventListener('change', () => {
-            editor.value = defaultCode[languageSelect.value];
-        });
+      runBtn.addEventListener("click", async () => {
+        const code = editor.value;
+        const language = languageSelect.value;
+        const stdin = stdinInput.value;
 
-        runBtn.addEventListener('click', async () => {
-            const code = editor.value;
-            const language = languageSelect.value;
-            const stdin = stdinInput.value;
-
-            if (!code.trim()) {
-                // FIX: Use displayError instead of alert()
-                displayError('Please enter some code to run.');
-                return;
-            }
-
-            // UI feedback
-            runBtn.disabled = true;
-            runBtn.textContent = 'Running...';
-            outputDiv.innerHTML = `<div class="flex items-center justify-center h-full"><div class="spinner"></div></div>`;
-            
-            try {
-                // Step 1: Submit code and get token
-                const submitResponse = await fetch(`${BACKEND_URL}/api/submit`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code, language, stdin })
-                });
-
-                if (!submitResponse.ok) {
-                    const error = await submitResponse.json();
-                    throw new Error(`Submission failed: ${error.details || error.error}`);
-                }
-                
-                const { token } = await submitResponse.json();
-
-                // Step 2: Poll for the result
-                pollForResult(token);
-
-            } catch (error) {
-                displayError(error.message);
-                resetRunButton();
-            }
-        });
-
-        function pollForResult(token) {
-            const intervalId = setInterval(async () => {
-                try {
-                    const statusResponse = await fetch(`${BACKEND_URL}/api/status/${token}`);
-                    if (!statusResponse.ok) {
-                        const error = await statusResponse.json();
-                        throw new Error(`Polling failed: ${error.details || error.error}`);
-                    }
-
-                    const result = await statusResponse.json();
-                    
-                    if (result.status.description !== "Pending") {
-                        clearInterval(intervalId);
-                        displayResult(result);
-                        resetRunButton();
-                    }
-                } catch (error) {
-                    clearInterval(intervalId);
-                    displayError(error.message);
-                    resetRunButton();
-                }
-            }, 2000); // Poll every 2 seconds
+        if (!code.trim()) {
+          // FIX: Use displayError instead of alert()
+          displayError("Please enter some code to run.");
+          return;
         }
 
-        function displayResult(result) {
-            let html = `
+        // UI feedback
+        runBtn.disabled = true;
+        runBtn.textContent = "Running...";
+        outputDiv.innerHTML = `<div class="flex items-center justify-center h-full"><div class="spinner"></div></div>`;
+
+        try {
+          // Step 1: Submit code and get token
+          const submitResponse = await fetch(`${BACKEND_URL}/api/submit`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code, language, stdin }),
+          });
+
+          if (!submitResponse.ok) {
+            const error = await submitResponse.json();
+            throw new Error(
+              `Submission failed: ${error.details || error.error}`
+            );
+          }
+
+          const { token } = await submitResponse.json();
+
+          // Step 2: Poll for the result
+          pollForResult(token);
+        } catch (error) {
+          displayError(error.message);
+          resetRunButton();
+        }
+      });
+
+      function pollForResult(token) {
+        const intervalId = setInterval(async () => {
+          try {
+            const statusResponse = await fetch(
+              `${BACKEND_URL}/api/status/${token}`
+            );
+            if (!statusResponse.ok) {
+              const error = await statusResponse.json();
+              throw new Error(
+                `Polling failed: ${error.details || error.error}`
+              );
+            }
+
+            const result = await statusResponse.json();
+
+            if (result.status.description !== "Pending") {
+              clearInterval(intervalId);
+              displayResult(result);
+              resetRunButton();
+            }
+          } catch (error) {
+            clearInterval(intervalId);
+            displayError(error.message);
+            resetRunButton();
+          }
+        }, 2000); // Poll every 2 seconds
+      }
+
+      function displayResult(result) {
+        let html = `
                 <div class="p-2 bg-gray-900 rounded-md mb-4">
-                    <p class="mb-2"><strong>Status:</strong> <span class="${result.status.toLowerCase().includes('error') || result.status.toLowerCase().includes('compilation') ? 'text-red-400' : 'text-green-400'}">${result.status}</span></p>
-                    <p class="mb-2"><strong>Time:</strong> ${result.time || 'N/A'}s</p>
-                    <p><strong>Memory:</strong> ${result.memory ? (result.memory / 1024).toFixed(2) : 'N/A'} MB</p>
+                    <p class="mb-2"><strong>Status:</strong> <span class="${
+                      result.status.toLowerCase().includes("error") ||
+                      result.status.toLowerCase().includes("compilation")
+                        ? "text-red-400"
+                        : "text-green-400"
+                    }">${result.status}</span></p>
+                    <p class="mb-2"><strong>Time:</strong> ${
+                      result.time || "N/A"
+                    }s</p>
+                    <p><strong>Memory:</strong> ${
+                      result.memory ? (result.memory / 1024).toFixed(2) : "N/A"
+                    } MB</p>
                 </div>
             `;
 
-            if (result.compile_output) {
-                html += `<h3 class="mt-4 font-semibold text-yellow-400">Compilation Output:</h3><pre class="bg-gray-900 p-2 rounded-md">${escapeHtml(result.compile_output)}</pre>`;
-            }
-            if (result.stderr) {
-                html += `<h3 class="mt-4 font-semibold text-red-400">Standard Error:</h3><pre class="bg-gray-900 p-2 rounded-md">${escapeHtml(result.stderr)}</pre>`;
-            }
-            // Show stdout even if it's empty, to be clear
-            html += `<h3 class="mt-4 font-semibold text-green-400">Standard Output:</h3><pre class="bg-gray-900 p-2 rounded-md">${result.stdout ? escapeHtml(result.stdout) : 'N/A'}</pre>`;
-            
-            outputDiv.innerHTML = html;
+        if (result.compile_output) {
+          html += `<h3 class="mt-4 font-semibold text-yellow-400">Compilation Output:</h3><pre class="bg-gray-900 p-2 rounded-md">${escapeHtml(
+            result.compile_output
+          )}</pre>`;
         }
+        if (result.stderr) {
+          html += `<h3 class="mt-4 font-semibold text-red-400">Standard Error:</h3><pre class="bg-gray-900 p-2 rounded-md">${escapeHtml(
+            result.stderr
+          )}</pre>`;
+        }
+        // Show stdout even if it's empty, to be clear
+        html += `<h3 class="mt-4 font-semibold text-green-400">Standard Output:</h3><pre class="bg-gray-900 p-2 rounded-md">${
+          result.stdout ? escapeHtml(result.stdout) : "N/A"
+        }</pre>`;
 
-        function displayError(errorMessage) {
-            outputDiv.innerHTML = `<h3 class="font-semibold text-red-400">An Error Occurred:</h3><pre class="bg-gray-900 p-2 rounded-md">${escapeHtml(errorMessage)}</pre>`;
-        }
+        outputDiv.innerHTML = html;
+      }
 
-        function resetRunButton() {
-            runBtn.disabled = false;
-            runBtn.textContent = 'Run Code';
-        }
-        
-        function escapeHtml(unsafe) {
-            return unsafe
-                 .replace(/&/g, "&amp;")
-                 .replace(/</g, "&lt;")
-                 .replace(/>/g, "&gt;")
-                 .replace(/"/g, "&quot;")
-                 .replace(/'/g, "&#039;");
-         }
+      function displayError(errorMessage) {
+        outputDiv.innerHTML = `<h3 class="font-semibold text-red-400">An Error Occurred:</h3><pre class="bg-gray-900 p-2 rounded-md">${escapeHtml(
+          errorMessage
+        )}</pre>`;
+      }
+
+      function resetRunButton() {
+        runBtn.disabled = false;
+        runBtn.textContent = "Run Code";
+      }
+
+      function escapeHtml(unsafe) {
+        return unsafe
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
     </script>
-</body>
+  </body>
 </html>
