@@ -31,8 +31,6 @@
         }
         @import url('https://rsms.me/inter/inter.css');
         
-        /* MODIFIED: Kept this rule for stdin, but removed #editor 
-        */
         #stdin {
             font-family: 'Fira Code', 'Courier New', monospace;
             tab-size: 4;
@@ -41,7 +39,7 @@
             white-space: pre;
         }
 
-        /* NEW: Styling for the CodeMirror editor itself 
+        /* MODIFIED: Added background-color to match bg-gray-800 
         */
         .CodeMirror {
             height: 24rem; /* h-96 */
@@ -50,8 +48,16 @@
             border: 1px solid #4B5563; /* border-gray-600 */
             border-radius: 0.375rem; /* rounded-md */
             outline: none;
-            
+            background-color: #1F2937; /* THIS IS THE FIX (Tailwind's gray-800) */
         }
+
+        /* NEW: Make the line-number gutter match the editor 
+        */
+        .CodeMirror-gutters {
+            background-color: #1F2937;
+            border-right: 1px solid #4B5563; /* Adds a nice separator */
+        }
+
         /* Style for the focused editor */
         .CodeMirror-focused {
             border-color: #3B82F6; /* ring-blue-500 */
